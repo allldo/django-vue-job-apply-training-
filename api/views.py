@@ -29,17 +29,21 @@ def questions_of_subject(request, subject):
 @api_view(['POST'])
 def add_question_to_subject(request, subject):
     subject_fr = get_object_or_404(Subject, title=subject)
-    question = request.data.get('question_data')
+    question = request.data.get('question')
+
     questions = Question.objects.filter(subject=subject_fr)
     serialized = QuestionSerializer(questions, many=True).data
     if question:
-        new_question = Question.objects.create(
-            question=question,
-            subject=subject_fr
-        )
-        return Response({
-            'created': True, 'new_question': new_question.question
-        })
+        mutated_dict = {
+            'question': request.data.get('question'),
+            'subject': subject_fr.id
+        }
+        serializer = QuestionSerializer(data=mutated_dict)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'created': True, 'new_question': question
+            })
     else:
         return Response({
             'questions': serialized, 'subject': subject
@@ -53,5 +57,5 @@ def delete_question(request, subject, question):
     question_id = question.id
     question.delete()
     return Response({
-        'data': 'deleted', 'item': question_id
+        'data': 'deleted', 'question_deleted': question_id
     })

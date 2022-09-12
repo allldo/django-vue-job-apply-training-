@@ -45,7 +45,8 @@ export default {
               getAPI.post(
                   `/api/add_question/${this.subject}`,
                   {
-                    question_data : qqe
+                    question : qqe,
+                    subject: 1
                   }
               )
                .then(response => {
@@ -66,7 +67,8 @@ export default {
               await getAPI.post(
                   `api/delete_question/${this.subject}/${arr}`
               ).then(response => {
-                $('#'+response.data.item).parent().remove()
+                console.log(response.data)
+                $('#'+response.data.question_deleted).parent().remove()
               })
 
             }
